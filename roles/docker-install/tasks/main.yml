@@ -1,0 +1,79 @@
+---
+- include: setup.yml
+
+- name: disable firewalld
+  become: yes
+  service: name=firewalld enabled=no state=stopped
+
+# follow instruction from offical docker website https://docs.docker.com/engine/installation/linux/centos/
+- name: remove unofficial Docker packages
+  become: yes
+  yum: name={{item}} state=absent
+  with_items:
+    - docker
+    - docker-common
+    - docker-selinux
+    - docker-engine
+  tags:
+  - setup
+  - dockerrun
+
+# install required packages
+- name: remove unofficial Docker packages
+  become: yes
+  yum: name={{item}} state=present
+  with_items:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+  tags:
+  - setup
+  - dockerrun
+
+# add docker.repo
+- name: add docker.repo
+  become: yes
+  template:
+    src: docker-ce.repo.j2
+    dest: /etc/yum.repos.d/docker-ce.repo
+  tags:
+  - setup
+  - dockerrun
+
+- name: install docker
+  become: yes
+  yum: name=docker-ce state=present
+  tags:
+  - setup
+  - dockerrun
+
+- name: install python-pip to install docker-py
+  become: yes
+  yum: name=python-pip state=latest
+  tags:
+  - setup
+  - dockerrun
+
+- name: install docker-py
+  become: yes
+  pip:
+    name: docker-py
+    state: present
+  tags:
+  - setup
+  - docker-py
+
+- name: Install python setup tools
+  become: yes
+  yum: name=python-setuptools
+  tags: docker
+
+- name: Install Pypi
+  become: yes
+  easy_install: name=pip
+  tags: docker
+
+- name: Make sure Docker is running
+  become: yes
+  service: name=docker state=running
+  tags: docker
