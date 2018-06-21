@@ -1,0 +1,30 @@
+---
+- name: Ensure ansible mysql_db can be used
+  pip:
+    name: docker-py
+    state: present
+
+- name: Ensure Sonar container has an up-to-date configuration
+  become: yes
+  docker_container:
+    name: "{{ sonar_container_name }}"
+    image: "{{ sonar_image }}"
+    state: started
+    restart: yes
+    ports:
+      - "{{ sonar_port }}:9000"
+      - "{{ sonar_port_2 }}:9092"
+    volumes:
+      - "{{ sonar_data_path }}:/opt/sonarqube/data"
+      - "{{ sonar_conf_path }}:/opt/sonarqube/conf"
+      - "{{ sonar_extensions_path }}:/opt/sonarqube/extensions"
+      - "{{ sonar_logs_path }}:/opt/sonarqube/logs"
+    command: "{{ sonar_command_var }}"
+    env:
+      SONARQUBE_JDBC_URL: "{{ sonar_jdbc_url }}"
+      SONARQUBE_JDBC_USERNAME: "{{ sonar_mysql_user }}"
+      SONARQUBE_JDBC_PASSWORD: "{{ sonar_mysql_password }}"
+
+- name: Make sure Sonar is responding on the configured port.
+  wait_for: port={{ sonar_port }} delay=3 timeout=300
+

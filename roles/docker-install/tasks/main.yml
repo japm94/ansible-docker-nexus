@@ -1,79 +1,29 @@
 ---
-- include: setup.yml
+- include_tasks: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
 
-- name: disable firewalld
-  become: yes
-  service: name=firewalld enabled=no state=stopped
+- include_tasks: setup-Debian.yml
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-# follow instruction from offical docker website https://docs.docker.com/engine/installation/linux/centos/
-- name: remove unofficial Docker packages
-  become: yes
-  yum: name={{item}} state=absent
-  with_items:
-    - docker
-    - docker-common
-    - docker-selinux
-    - docker-engine
-  tags:
-  - setup
-  - dockerrun
+- name: Install Docker.
+  become: true
+  package:
+    name: "{{ docker_package }}"
+    state: "{{ docker_package_state }}"
+  notify: restart docker
 
-# install required packages
-- name: remove unofficial Docker packages
-  become: yes
-  yum: name={{item}} state=present
-  with_items:
-    - yum-utils
-    - device-mapper-persistent-data
-    - lvm2
-  tags:
-  - setup
-  - dockerrun
+- name: Ensure Docker is started and enabled at boot.
+  service:
+    name: docker
+    state: "{{ docker_service_state }}"
+    enabled: "{{ docker_service_enabled }}"
 
-# add docker.repo
-- name: add docker.repo
-  become: yes
-  template:
-    src: docker-ce.repo.j2
-    dest: /etc/yum.repos.d/docker-ce.repo
-  tags:
-  - setup
-  - dockerrun
+- name: Ensure handlers are notified now to avoid firewall conflicts.
+  meta: flush_handlers
+  when: docker_restart_on_package_change
 
-- name: install docker
-  become: yes
-  yum: name=docker-ce state=present
-  tags:
-  - setup
-  - dockerrun
+- include_tasks: docker-compose.yml
+  when: docker_install_compose
 
-- name: install python-pip to install docker-py
-  become: yes
-  yum: name=python-pip state=latest
-  tags:
-  - setup
-  - dockerrun
-
-- name: install docker-py
-  become: yes
-  pip:
-    name: docker-py
-    state: present
-  tags:
-  - setup
-  - docker-py
-
-- name: Install python setup tools
-  become: yes
-  yum: name=python-setuptools
-  tags: docker
-
-- name: Install Pypi
-  become: yes
-  easy_install: name=pip
-  tags: docker
-
-- name: Make sure Docker is running
-  become: yes
-  service: name=docker state=running
-  tags: docker
+- include_tasks: docker-users.yml
+  when: docker_users

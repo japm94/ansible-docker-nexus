@@ -1,0 +1,28 @@
+---
+- name: Creates directory
+  become: yes
+  file: path=/nexus-data state=directory
+
+- name: install docker-py
+  become: yes
+  pip:
+    name: docker-py
+    state: present
+
+- name: Nexus docker image
+  become: yes
+  docker:
+    name: nexus
+    image: sonatype/nexus3
+    state: present
+    volumes:
+    - /nexus-data
+
+- name: Start a container
+  become: yes
+  docker_container:
+    name: nexus
+    image: sonatype/nexus3
+    state: started
+    ports:
+     - "8081:8081"

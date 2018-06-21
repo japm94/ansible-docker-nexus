@@ -1,0 +1,13 @@
+---
+- name: Ensure MySQL users are present.
+  become: yes
+  mysql_user:
+    name: "{{ item.name }}"
+    host: "{{ item.host }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv | default('*.*:ALL') }}"
+    state: "{{ item.state | default('present') }}"
+    append_privs: "{{ item.append_privs | default('false') }}"
+    encrypted: "{{ item.encrypted | default('no') }}"
+  with_items: 
+    - {name: sonar, host: '%' ,password: sonar}

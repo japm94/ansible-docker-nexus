@@ -1,6 +1,0 @@
----
-- hosts: nexus
-  gather_facts: no
-  roles:
-    - docker-install
-    - nexus

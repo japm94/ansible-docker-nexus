@@ -1,0 +1,20 @@
+---
+workspace: /tmp
+
+sonar_mysql_user: "sonar"
+sonar_mysql_password: "sonar"
+sonar_database_name: "sonar"
+
+sonar_image: "sonarqube:latest"
+sonar_port: 9000
+sonar_port_2: 9092
+sonar_path: "/data/docker/sonarqube"
+sonar_data_path: "{{ sonar_path }}/data"
+sonar_conf_path: "{{ sonar_path }}/conf"
+sonar_extensions_path: "{{ sonar_path }}/extensions"
+sonar_logs_path: "{{ sonar_path }}/data"
+
+sonar_jdbc_url: "jdbc:mysql://10.88.0.204:3306/{{ sonar_database_name }}?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true"
+sonar_command_var: ""
+
+sonar_container_name: "sonar"

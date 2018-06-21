@@ -1,0 +1,22 @@
+---
+- hosts: all
+  gather_facts: true
+  roles:
+    - pip
+    - docker-install
+
+- hosts: sonar
+  gather_facts: true
+  roles:
+    - mysql
+    - docker-sonar
+
+- hosts: jenkins
+  gather_facts: true
+  roles:
+    - docker-jenkins
+  
+- hosts: nexus
+  gather_facts: true
+  roles:
+    - docker-nexus

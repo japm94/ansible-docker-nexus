@@ -1,0 +1,29 @@
+---
+- name: Creates directory
+  become: yes
+  file: path=/home/ubuntu/jenkins_home state=directory
+
+- name: install docker-py
+  become: yes
+  pip:
+    name: docker-py
+    state: present
+
+- name: Jenkins Docker Image
+  become: yes
+  docker:
+    name: jenkins
+    image: "jenkins"
+    state: present
+    volumes:
+    - "/home/ubuntu/jenkins_home:/var/jenkins_home"
+
+- name: Start a container
+  become: yes
+  docker_container:
+    name: jenkins
+    image: jenkins
+    state: started
+    ports:
+     - "8080:8080"
+     - "50000:50000"
