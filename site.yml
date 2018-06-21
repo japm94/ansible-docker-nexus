@@ -2,7 +2,7 @@
 - hosts: all
   gather_facts: true
   roles:
-    - pip
+    - pip-install
     - docker-install
 
 - hosts: sonar
