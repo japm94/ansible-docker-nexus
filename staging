@@ -1,0 +1,8 @@
+# BRM POOL
+[docker_nexus]
+10.88.0.142 ansible_user=ubuntu ansible_python_interpreter=/usr/bin/python3
+[docker_sonar]
+10.88.0.30 ansible_user=ubuntu ansible_python_interpreter=/usr/bin/python3
+[docker_jenkins]
+10.88.0.204 ansible_user=ubuntu ansible_python_interpreter=/usr/bin/python3
+

@@ -1,7 +1,12 @@
 ---
 - name: Creates directory
   become: yes
-  file: path=/home/ubuntu/jenkins_home state=directory
+  file: 
+    path: /opt/docker/jenkins/jenkins_home 
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: 0755
 
 - name: install docker-py
   become: yes
@@ -11,19 +16,21 @@
 
 - name: Jenkins Docker Image
   become: yes
-  docker:
+  docker_container:
     name: jenkins
-    image: "jenkins"
+    image: "jenkins/jenkins:lts"
     state: present
-    volumes:
-    - "/home/ubuntu/jenkins_home:/var/jenkins_home"
 
-- name: Start a container
+- name: Starting Container
   become: yes
   docker_container:
     name: jenkins
-    image: jenkins
+    image: "jenkins/jenkins:lts"
     state: started
+    restart_policy: unless-stopped
+    restart: yes
     ports:
-     - "8080:8080"
-     - "50000:50000"
+    - "80:8080"
+    - "50000:50000"
+    volumes:
+    - "/opt/docker/jenkins/jenkins_home:/var/jenkins_home"
